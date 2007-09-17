@@ -210,6 +210,17 @@ class VersionControl_SVN
     var $svn_path = '/usr/local/bin/svn';
 
     /**
+     * String to prepend to command string. Helpful for setting exec() 
+     * environment variables, such as: 
+     *    export LANG=en_US.utf8 &&
+     * ... to support non-ASCII file and directory names.
+     * 
+     * @var     string $prepend_cmd
+     * @access  public
+     */
+    var $prepend_cmd = '';
+
+    /**
      * Array of switches to use in building svn command
      *
      * @var     array
@@ -626,9 +637,9 @@ class VersionControl_SVN
         }
         
         if (!$this->passthru) {
-            exec("$cmd 2>&1", $out, $ret_var);
+            exec("{$this->prepend_cmd}$cmd 2>&1", $out, $ret_var);
         } else {
-            passthru("$cmd 2>&1", $ret_var);
+            passthru("{$this->prepend_cmd}$cmd 2>&1", $ret_var);
         }
 
         if ($ret_var > 0) {
