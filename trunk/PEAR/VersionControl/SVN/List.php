@@ -351,7 +351,7 @@ class VersionControl_SVN_List extends VersionControl_SVN
             $item_vdata = array();
             foreach ($items as $item) {
                 // Regex should work with svn list's "%b %d %H:%M" and "%b %d  %Y" date formats
-                preg_match("/\s*(\d+) (\S+)\s+(\d+)? (\w{3}.+\d{2}) (.*)/", $item, $matches);
+                preg_match("/\s*(\d+) \s?(\S+)\s+(\d+)? (\w{3} +\d{2} +\d{2}:?\d{2}) (.*)/", $item, $matches);
                 $path_items[] = $matches[5];
                 $item_vdata[] = array(
                                 'revision'  => $matches[1],
