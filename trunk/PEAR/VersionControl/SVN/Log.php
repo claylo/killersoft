@@ -159,7 +159,8 @@ class VersionControl_SVN_Log extends VersionControl_SVN
                                 'non-interactive',
                                 'non_interactive',
                                 'config-dir',
-                                'config_dir'
+                                'config_dir',
+                                'limit'
                                 );
 
     
