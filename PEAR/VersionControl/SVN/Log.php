@@ -232,6 +232,7 @@ class VersionControl_SVN_Log extends VersionControl_SVN
                     case 'username':
                     case 'password':
                     case 'config-dir':
+                    case 'limit':
                         $_switches .= "--$switch $val ";
                         break;
                     case 'r':
