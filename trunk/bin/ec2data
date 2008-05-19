@@ -1,0 +1,107 @@
+#!/bin/env php
+<?php
+/**
+ * 
+ * ec2data
+ *
+ * Copyright (c) 2008, Clay Loveless <clay@killersoft.com>.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *   * Neither the name of Clay Loveless nor the names of his
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @author     Clay Loveless <clay@killersoft.com>
+ * @copyright  2008 Clay Loveless <clay@killersoft.com>
+ * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version    1.0.0
+ * 
+ */
+ 
+// heading
+$head = "ec2data 1.0.0 by Clay Loveless.\n\n";
+$head .= 'Running on: ' . php_uname('n') . "\n\n";
+
+$latest = 'http://169.254.169.254/latest';
+
+$meta = explode("\n", file_get_contents($latest.'/meta-data'));
+
+$meta_table = array();
+foreach ($meta as $type) {
+    $result = explode("\n", file_get_contents($latest . '/meta-data/' . $type));
+
+    $len = array();
+    foreach ($result as $line) {
+        $len[] = strlen($line);
+    }
+    $maxlen = max($len);
+    
+    $meta_table[$type] = array(
+        'result'    => $result, 
+        'maxlen'    => $maxlen
+    );
+}
+
+// determine table size
+$keylen = array();
+$valuelen = array();
+
+foreach ($meta_table as $key => $data) {
+    $keylen[] = strlen($key);
+    $valuelen[] = $data['maxlen'];
+}
+$key_width = max($keylen) + 2;
+$value_width = max($valuelen) + 2;
+
+echo $head;
+
+// build and output the data
+$div = '+-' 
+     . str_repeat('-', $key_width) 
+     . '-+-' 
+     . str_repeat('-', $value_width) 
+     . '-+';
+
+echo $div."\n";
+
+foreach ($meta_table as $key => $data) {
+    echo '| ' . str_pad($key, $key_width) . ' | ';
+    $result = $data['result'];
+    if (sizeof($result) == 1) {
+        echo str_pad($result[0], $value_width) . " |\n";
+    } else {
+        $line = array_shift($result);
+        echo str_pad($line, $value_width) . " |\n";
+        foreach ($result as $line) {
+            echo '| ' . str_pad('', $key_width) . ' | ';
+            echo str_pad($line, $value_width) . " |\n";
+        }
+    }
+    echo $div."\n";
+}
+
