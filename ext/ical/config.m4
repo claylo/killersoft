@@ -53,6 +53,6 @@ if test "$PHP_ICAL" != "no"; then
 
 	PHP_SUBST(ICAL_SHARED_LIBADD)
 
-   	PHP_NEW_EXTENSION(ical, [icalcomponent.c], 
+   	PHP_NEW_EXTENSION(ical, [php_ical.c icalcomponent.c], 
    	                         $ext_shared)
 fi
