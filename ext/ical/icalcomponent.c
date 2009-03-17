@@ -19,9 +19,9 @@
 #endif
 
 #include "php.h"
-#include "php_ical.h"
 
 #if HAVE_ICAL
+#include "php_ical.h"
 
 
 /* {{{ arginfo */
@@ -38,16 +38,16 @@ ZEND_END_ARG_INFO();
 */
 /* static zend_object handlers icalcomponent_handlers; */
 
-static zend_class_entry *icalcomponent_ce;
+zend_class_entry *ical_component_class_entry;
 
-typedef struct _icalcomponent_object {
+typedef struct _ical_component_object {
     zend_object std;
-} icalcomponent_object;
+} ical_component_object;
 
 
 
 /* {{{ icalcomponent_functions[] */
-function_entry icalcomponent_functions[] = {
+function_entry ical_component_functions[] = {
     { NULL, NULL, NULL }
 };
 /* }}} */
@@ -55,7 +55,7 @@ function_entry icalcomponent_functions[] = {
 PHP_METHOD(ICalComponent, __construct)
 {
     zval *object = getThis();
-    icalcomponent_object *intern;
+    ical_component_object *intern;
     
     /* intern = (icalcomponent_object*)zend_object_store_get_object(object TSRML_CC); */
 }
@@ -64,13 +64,13 @@ static zend_function_entry ICalComponent_methods[] = {
     PHP_ME(ICalComponent, __construct, arginfo__construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 };
 
-static void class_init_ICalComponent(void)
+
+PHP_MINIT_FUNCTION(ical_component)
 {
     zend_class_entry ce;
-
+    
     INIT_CLASS_ENTRY(ce, "ICalComponent", ICalComponent_methods);
-    icalcomponent_ce = zend_register_internal_class(&ce);
+    ical_component_class_entry = zend_register_internal_class(&ce);
 }
-
 
 #endif /* HAVE_ICAL */
