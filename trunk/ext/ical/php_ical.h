@@ -19,18 +19,15 @@
 
 #define PHP_ICAL_VERSION "0.0.1-dev"
 
+/* Import configure options 
+   when building outside of 
+   the PHP source tree */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+/* Include PHP Standard Header */
 #include "php.h"
-#include "php_ini.h"
-
-#include "zend.h"
-#include "zend_API.h"
-#include "zend_execute.h"
-#include "zend_compile.h"
-#include "zend_extensions.h"
 
 #ifdef ZTS
 #include "TSRM.h"
@@ -47,11 +44,6 @@
 extern zend_module_entry ical_module_entry;
 #define phpext_ical_ptr &ical_module_entry
 
-PHP_MINIT_FUNCTION(ical);
-PHP_RINIT_FUNCTION(ical);
-PHP_MSHUTDOWN_FUNCTION(ical);
-PHP_RSHUTDOWN_FUNCTION(ical);
-PHP_MINFO_FUNCTION(ical);
 
 #ifdef ZEND_ENGINE_2
 zend_class_entry *ical_class_entry;
@@ -59,7 +51,7 @@ zend_class_entry *ical_class_entry;
 
 
 /* declarations of methods to be exported */
-PHP_METHOD(ICalComponent, __constructor);
+
 
 
 

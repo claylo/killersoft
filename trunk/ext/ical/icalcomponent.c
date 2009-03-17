@@ -20,16 +20,6 @@
 
 #include "php.h"
 #include "php_ical.h"
-#include "ext/standard/info.h"
-
-#include "zend_compile.h"
-#include "zend_interfaces.h"
-#include "zend_exceptions.h"
-
-#include "fopen_wrappers.h"
-#include "ext/standard/basic_functions.h"
-#include "ext/standard/php_filestat.h"
-#include "php_streams.h"
 
 #if HAVE_ICAL
 
@@ -82,58 +72,5 @@ static void class_init_ICalComponent(void)
     icalcomponent_ce = zend_register_internal_class(&ce);
 }
 
-/* {{{ icalcomponent_module_entry
- */
-zend_module_entry ical_module_entry = {
-    STANDARD_MODULE_HEADER,
-    "ical",
-    icalcomponent_functions,
-    PHP_MINIT(ical),
-    PHP_MSHUTDOWN(ical),
-    NULL,
-    NULL,
-    PHP_MINFO(ical),
-    PHP_ICAL_VERSION,
-    STANDARD_MODULE_PROPERTIES
-};
-/* }}} */
-
-#ifdef COMPILE_DL_ICAL
-ZEND_GET_MODULE(ical)
-#endif
-
-/* {{{ PHP_MINIT_FUNCTION */
-PHP_MINIT_FUNCTION(ical)
-{
-    class_init_ICalComponent();
-
-    /* add your stuff here */
-
-    return SUCCESS;
-}
-/* }}} */
-
-/* {{{ PHP_MSHUTDOWN_FUNCTION */
-PHP_MSHUTDOWN_FUNCTION(ical)
-{
-
-    /* add your stuff here */
-
-    return SUCCESS;
-}
-/* }}} */
-
-/* {{{ PHP_MINFO_FUNCTION */
-PHP_MINFO_FUNCTION(ical)
-{
-    php_info_print_table_start();
-    {
-        php_info_print_table_row(2, "ICal support", "enabled");
-        php_info_print_table_row(2, "Extension version", PHP_ICAL_VERSION);
-        php_info_print_table_row(2, "libical version", ICAL_VERSION);
-    }
-    php_info_print_table_end();
-}
-/* }}} */
 
 #endif /* HAVE_ICAL */
