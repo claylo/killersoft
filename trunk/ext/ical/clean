@@ -1,8 +1,0 @@
-#!/bin/sh
-rm -Rf .deps .libs build include modules autom4te.cache
-rm -f acinclude.m4 aclocal.m4 \
-  *.lo *.la *.loT install-sh libtool ltmain.sh \
-  missing mkinstalldirs run-tests.php \
-  config.h.in configure.in configure config.sub config.guess \
-  Makefile Makefile.* config.log config.nice config.status config.h
-

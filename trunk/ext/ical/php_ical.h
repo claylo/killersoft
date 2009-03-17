@@ -45,9 +45,9 @@ extern zend_module_entry ical_module_entry;
 #define phpext_ical_ptr &ical_module_entry
 
 
-#ifdef ZEND_ENGINE_2
-zend_class_entry *ical_class_entry;
-#endif
+
+extern zend_class_entry *ical_component_class_entry;
+
 
 
 /* declarations of methods to be exported */
