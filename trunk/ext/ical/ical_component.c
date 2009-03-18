@@ -38,39 +38,30 @@ ZEND_END_ARG_INFO();
 */
 /* static zend_object handlers icalcomponent_handlers; */
 
-zend_class_entry *ical_component_class_entry;
-
-typedef struct _ical_component_object {
-    zend_object std;
-} ical_component_object;
 
 
 
-/* {{{ icalcomponent_functions[] */
+
+/* {{{ ical_component_functions[] */
 function_entry ical_component_functions[] = {
     { NULL, NULL, NULL }
 };
 /* }}} */
 
-PHP_METHOD(ICalComponent, __construct)
-{
-    zval *object = getThis();
-    ical_component_object *intern;
-    
-    /* intern = (icalcomponent_object*)zend_object_store_get_object(object TSRML_CC); */
-}
-
-static zend_function_entry ICalComponent_methods[] = {
+zend_function_entry ical_component_class_functions[] = {
     PHP_ME(ICalComponent, __construct, arginfo__construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 };
 
 
-PHP_MINIT_FUNCTION(ical_component)
+PHP_METHOD(ICalComponent, __construct)
 {
-    zend_class_entry ce;
+    zval *object = getThis();
+
     
-    INIT_CLASS_ENTRY(ce, "ICalComponent", ICalComponent_methods);
-    ical_component_class_entry = zend_register_internal_class(&ce);
+    /* intern = (icalcomponent_object*)zend_object_store_get_object(object TSRML_CC); */
 }
+
+
+
 
 #endif /* HAVE_ICAL */
