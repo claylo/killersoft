@@ -1,11 +1,35 @@
 #include "php_ical.h"
 
-PHP_MINIT_FUNCTION(ical);
+/* many thanks for the fine example set by the Dom extension */
+
+zend_class_entry *ical_component_class_entry;
+
+zend_object_handlers ical_object_handlers;
+
+static HashTable classes;
+
+static HashTable ical_component_prop_handlers;
+
+typedef int (*ical_read_t)(ical_object *obj, zval **retval TSRMLS_DC);
+typedef int (*ical_write_t)(ical_object *obj, zval *newval TSRMLS_DC);
+
+typedef struct _ical_prop_handler {
+    ical_read_t read_func;
+    ical_write_t write_func;
+} ical_prop_handler;
+
+
+/* PHP_MINIT_FUNCTION(ical);
 PHP_MINFO_FUNCTION(ical);
+*/
 
 function_entry ical_functions[] = {
     {NULL, NULL, NULL}
 };
+
+static zend_object_handlers* ical_get_obj_handlers(TSRMLS_D) {
+    return &ical_object_handlers;
+}
 
 /* {{{ icalcomponent_module_entry
  */
@@ -30,9 +54,13 @@ ZEND_GET_MODULE(ical)
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(ical)
 {
-    /* class_init_ICalComponent(); */
+    zend_class_entry ce;
+    
+    memcpy(&ical_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+    
+    zend_hash_init(&classes, 0, NULL, NULL, 1);
 
-    PHP_MINIT(ICalComponent)(INIT_FUNC_ARGS_PASSTHRU);
+    REGISTER_ICAL_CLASS(ce, "ICalComponent", NULL, ical_component_class_functions, ical_component_class_entry);
 
     return SUCCESS;
 }

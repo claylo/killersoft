@@ -19,6 +19,7 @@
 
 #define PHP_ICAL_VERSION "0.0.1-dev"
 
+
 /* Import configure options 
    when building outside of 
    the PHP source tree */
@@ -44,15 +45,47 @@
 extern zend_module_entry ical_module_entry;
 #define phpext_ical_ptr &ical_module_entry
 
-
-
-extern zend_class_entry *ical_component_class_entry;
-
-
-
-/* declarations of methods to be exported */
+#define PHP_ICAL_EXPORT PHPAPI
 
 
 
 
-#endif
+typedef struct _ical_object {
+	zend_object  std;
+	void *ptr;
+	icalcomponent *component;
+	HashTable *prop_handler;
+	zend_object_handle handle;
+} ical_object;
+
+
+#include "ical_ce.h"
+#include "ical_fe.h"
+
+zend_object_value ical_objects_new(zend_class_entry *class_type TSRMLS_DC);
+
+
+#define REGISTER_ICAL_CLASS(ce, name, parent_ce, funcs, entry) \
+INIT_CLASS_ENTRY(ce, name, funcs); \
+ce.create_object = ical_objects_new; \
+entry = zend_register_internal_class_ex(&ce, parent_ce, NULL TSRMLS_CC);
+
+#define ICAL_GET_OBJ(__ptr, __id, __prtype, __intern) { \
+	__intern = (ical_object *)zend_object_store_get_object(__id TSRMLS_CC); \
+	if (__intern->ptr == NULL) { \
+  		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Couldn't fetch %s", __intern->std.ce->name);\
+  		RETURN_NULL();\
+  	} \
+}
+
+#define ICAL_NO_ARGS() \
+	if (ZEND_NUM_ARGS() != 0) { \
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Expects exactly 0 parameters, %d given", ZEND_NUM_ARGS()); \
+		return; \
+	}
+
+
+PHP_MINIT_FUNCTION(ical);
+PHP_MINFO_FUNCTION(ical);
+
+#endif /* PHP_ICAL_H */
