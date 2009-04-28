@@ -45,7 +45,6 @@
  * 
  * @version $Id$
  * 
- * @todo Support alternate path for auto-gzipped uploads.
  * @todo Add some degree of S3 service fault-tolerance via retries.
  * 
  */
@@ -60,8 +59,8 @@
  * $dest   = "my-bucket/stuff";
  * 
  * $s3 = new Killersoft_Service_Amazon_S3_BatchPut(
- *     $creds['access_key'],
- *     $creds['secret_key']
+ *     'my_access_key',
+ *     'my_secret_key'
  * );
  *
  * $results = $s3->setSourceDir($source)
@@ -70,7 +69,7 @@
  *               ->run()
  *               ->getResponses();
  *
- * if ($s3->hasErrors()) {
+ * if ($s3->hadErrors()) {
  *   var_dump($s3->getErrors());
  * }
  * 
@@ -99,9 +98,33 @@ class Killersoft_Service_Amazon_S3_BatchPut {
         'png'   => 'image/png',
         'swf'   => 'application/x-shockwave-flash',
         'mov'   => 'video/quicktime',
-        'flv'   => 'video/x-flv'        
+        'flv'   => 'video/x-flv',
+        'gz'    => 'application/x-gzip',
+        'bz2'   => 'application/x-bzip',
+        'tar.gz'=> 'application/x-tgz',
+        'tgz'   => 'application/x-tgz',
+        'tar.bz2'=> 'application/x-bzip-compressed-tar',
+        'tar'   => 'application/x-tar',
+        'zip'   => 'application/zip',
     );
     public $default_content_type = 'application/octet-stream';
+    
+    /**
+     * If compression is enabled, what content types should be
+     * compressed.
+     */
+    public $compressable = array(
+        'css',
+        'js'
+    );
+    
+    /**
+     * Skip uploading files found in paths containing these strings.
+     */
+    public $skip_paths = array(
+        '.git',
+        '.svn'
+    );
     
     /**
      * Debug mode
@@ -117,9 +140,15 @@ class Killersoft_Service_Amazon_S3_BatchPut {
     public $expires = 31536000;
     
     /**
+     * Compression
+     */
+    public $compress = false;
+    
+    /**
      * Canned ACL for uploaded items
      */
     public $acl = 'public-read';
+    public $aclpath = null;
     
     /**
      * Additional headers
@@ -136,13 +165,30 @@ class Killersoft_Service_Amazon_S3_BatchPut {
      */
     public $destination_bucket;
     
+    /**
+     * Batch size trigger
+     */
+    protected $_autorun = 20;
     
     /**
      * Curl handles and file pointers
      */
     protected $_mh;
     protected $_chs = array();
-    protected $_fhs = array();
+    protected $_fps = array();
+    
+    /**
+     * List of paths to temporary gzipped files that
+     * will be cleaned up post-upload.
+     */
+    protected $_unlink = array();
+    
+    /**
+     * ACL handles and file pointers
+     */
+    protected $_amh;
+    protected $_achs = array();
+    protected $_aclh;
     
     /**
      * Request responses
@@ -211,6 +257,24 @@ class Killersoft_Service_Amazon_S3_BatchPut {
         }
         return $this;
     }
+
+    /**
+     * Enable/disable compression of text types
+     * 
+     * @param bool $on TRUE to turn on compression,
+     * FALSE to turn off compression (default).
+     * 
+     * @return object Killersoft_Service_Amazon_S3_BatchPut
+     */
+    public function compress($on = false)
+    {
+        if ($on === true && function_exists('gzencode')) {
+            $this->compress = true;
+        } else {
+            $this->compress = false;
+        }
+        return $this;
+    }
     
     /**
      * Set the location of the debug log. Will only be set 
@@ -245,6 +309,22 @@ class Killersoft_Service_Amazon_S3_BatchPut {
         }
         return $this;
     }
+
+    /**
+     * Override default skip-paths. Any paths discovered containing 
+     * directories with these names will be ignored.
+     * 
+     * @param array $paths Array of path names to exclude.
+     * 
+     * @return object Killersoft_Service_Amazon_S3_BatchPut
+     */
+    public function setSkipPaths($paths)
+    {
+        if (is_array($paths)) {
+            $this->skip_paths = $paths;
+        }
+        return $this;
+    }
     
     /**
      * Set the path of the directory to read source files from.
@@ -271,6 +351,48 @@ class Killersoft_Service_Amazon_S3_BatchPut {
     }
     
     /**
+     * Set an ACL request document to PUT alongside each uploaded
+     * file. Or, a canned ACL of:
+     * 
+     * private
+     * public-read
+     * public-read-write
+     * authenticated-read
+     * 
+     * @see http://docs.amazonwebservices.com/AmazonS3/2006-03-01/index.html?S3_ACLs.html
+     * @see http://docs.amazonwebservices.com/AmazonS3/2006-03-01/index.html?RESTAccessPolicy.html
+     * @param string $aclpath Path to ACL XML document.
+     * @return object Killersoft_Service_Amazon_S3_BatchPut
+     */
+    public function useACL($acl)
+    {
+        if (empty($acl)) {
+            $this->acl = 'private';
+            return $this;
+        }
+        
+        $canned = array(
+            'private',
+            'public-read',
+            'public-read-write',
+            'authenticated-read'
+        );
+        
+        if (in_array($acl, $canned)) {
+            $this->acl = $acl;
+            return $this;
+        }
+        
+        // treat $acl like a path to a file
+        if (file_exists($acl)) {
+            $this->acl = null;
+            $this->aclpath = $acl;
+        }
+        return $this;        
+    }
+    
+    
+    /**
      * Creates curl handles for all files and 
      * manages runtime of curl_multi_exec. When
      * complete, fetch responses from getResponses()
@@ -279,34 +401,48 @@ class Killersoft_Service_Amazon_S3_BatchPut {
      */
     public function run()
     {
+        $handler = $this->_mh;
         $this->_loadMultiHandler();
-        
+        $this->_execute($handler);        
+        $this->_extractResponses();
+        return $this;
+    }
+    
+    public function setBatchSize($num = 50)
+    {
+        $this->_autorun = intval($num);
+        return $this;
+    }
+    
+    /**
+     * Execute the curl multi handler.
+     * 
+     */
+    protected function _execute($handler)
+    {
         // execute all the handles
         $active = null;
         do {
-            $mrc = curl_multi_exec($this->_mh, $active);
+            $mrc = curl_multi_exec($handler, $active);
             if ($this->debug) {
-                $info = curl_multi_info_read($this->_mh); 
+                $info = curl_multi_info_read($handler); 
                 fwrite($this->_dbg, 
                     var_export($info, true) . "\n");
             }
         } while ($mrc == CURLM_CALL_MULTI_PERFORM);
 
         while ($active && $mrc == CURLM_OK) {
-            if (curl_multi_select($this->_mh) != -1) {
+            if (curl_multi_select($handler) != -1) {
                 do {
-                    $mrc = curl_multi_exec($this->_mh, $active);
+                    $mrc = curl_multi_exec($handler, $active);
                     if ($this->debug) {
-                        $info = curl_multi_info_read($this->_mh); 
+                        $info = curl_multi_info_read($handler); 
                         fwrite($this->_dbg, 
                             var_export($info, true) . "\n");
                     }
                 } while ($mrc == CURLM_CALL_MULTI_PERFORM);
             }
-        }
-        
-        $this->_extractResponses();
-        return $this;
+        }        
     }
     
     /**
@@ -383,14 +519,21 @@ class Killersoft_Service_Amazon_S3_BatchPut {
      */ 
     public function __destruct()
     {
-        foreach ($this->_chs as $i => $ch) {
-            curl_multi_remove_handle($this->_mh, $ch);
-            curl_close($ch);
+        if (! $this->_autorun) {
+            foreach ($this->_chs as $i => $ch) {
+                curl_multi_remove_handle($this->_mh, $ch);
+                curl_close($ch);
+            }
         }
         curl_multi_close($this->_mh);
+        if ($this->_amh) {
+            curl_multi_close($this->_amh);
+        }
         
-        foreach ($this->_fhs as $i => $fh) {
-            fclose($fh);
+        if (! empty($this->_unlink)) {
+            foreach ($this->_unlink as $path) {
+                @unlink($path);
+            }
         }
         
         if ($this->debug && is_resource($this->_dbg)) {
@@ -407,21 +550,58 @@ class Killersoft_Service_Amazon_S3_BatchPut {
         // extract responses
         $this->responses = array();
         $this->errors = array();
-        foreach ($this->_chs as $ch) {
+        
+        // ACL multi-handle
+        $run_amh = false;
+        
+        foreach ($this->_chs as $url => $ch) {
             // check for errors
             $error = curl_error($ch);
             if (empty($error)) {
+                $r = curl_multi_getcontent($ch);
+                $info = curl_getinfo($ch);
                 $this->responses[] = array(
-                    'response' => curl_multi_getcontent($ch),
-                    'info' => curl_getinfo($ch)
+                    'response' => $r,
+                    'info' => $info
                 );
+                
+                if ($this->_autorun) {
+                    curl_multi_remove_handle($this->_mh, $ch);
+                    curl_close($ch);
+                    unset($this->_chs[$url]);
+                    fclose($this->_fps[$url]);
+                    unset($this->_fps[$url]);
+                }
+                
+                // ACL multi-handle
+                if (is_array($this->_achs) && !empty($this->_achs)) {
+                    if (! $this->_amh) {
+                        $this->_amh = curl_multi_init();
+                    }
+                    curl_multi_add_handle(
+                        $this->_amh, $this->_achs[$info['url']]
+                    );
+                    $run_amh = true;
+                }
+                
             } else {
+                $info = curl_getinfo($ch);
                 $this->errors[] = array(
                     'error' => $error,
-                    'info'  => curl_getinfo($ch)
+                    'info'  => $info
                 );
             }
-        }        
+        }
+        
+        if ($run_amh) {
+            // run ACL calls
+            $this->_execute($this->_amh);
+            foreach ($this->_amhs as $path => $ch) {
+                curl_multi_remove_handle($this->_amh, $ch);
+                curl_close($ch);
+            }
+        }
+        
     }
     
     /**
@@ -436,16 +616,45 @@ class Killersoft_Service_Amazon_S3_BatchPut {
             $this->_dbg = @fopen($this->debug_log, 'a');
         }
         
+        // avoid compression problems
+        if (! function_exists('gzencode')) {
+            $this->compress = false;
+        }
+        
         $sourcelen = strlen($this->source_dir);
         $sourcedir = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($this->source_dir));
         
-        $i = 0;
+        $a = 0; // autorun trigger
         foreach ($sourcedir as $item) {
+            // skip dotfiles
+            $filename = $item->getFilename();
+            if ($filename[0] == '.') {
+                continue;
+            }
+            
+            // skip skip-paths
+            $pathname = $item->getPathname();
+            foreach ($this->skip_paths as $skip) {
+                $skip = $skip . DIRECTORY_SEPARATOR;
+                if (strpos($pathname, $skip) !== false) {
+                    continue 2;
+                }
+            }
+            
+            if ($this->_autorun && $a >= $this->_autorun) {
+                $this->_execute($this->_mh);        
+                $this->_extractResponses();     
+                $a = 0;
+                // needed to avoid max files open errors
+                clearstatcache();
+            }
+            
             $file = substr($item->getPathname(), $sourcelen);
 
             // use file extension for content-type
             $pos = strrpos($file, '.');
+            $ext = false;
             if ($pos !== false) {
                 $ext = substr($file, $pos+1);
                 if (isset($this->content_types[$ext])) {
@@ -460,21 +669,49 @@ class Killersoft_Service_Amazon_S3_BatchPut {
             $dest_path = '/' 
                        . trim($this->destination_bucket, '/') 
                        . '/' . $file;
-
+            $source_path = $this->source_dir 
+                   . DIRECTORY_SEPARATOR 
+                   . $file;
+            
+            
             $date   = gmdate('D, d M Y G:i:s O');
             $method = 'PUT';
             $content_md5 = '';
+            $compressed = false;
+            
+            if ($this->compress 
+                && in_array($ext, $this->compressable)) {
+                
+                // compress to a temp dir
+                $gzfile = tempnam(sys_get_temp_dir(), 'BatchPut');
+                file_put_contents($gzfile, 
+                    gzencode(
+                        file_get_contents(
+                            $this->source_dir 
+                            . DIRECTORY_SEPARATOR 
+                            . $file
+                        )
+                    )
+                );
+                if (file_exists($gzfile)) {
+                    $compressed = true;
+                    $this->_unlink[] = $gzfile;
+                    $source_path = $gzfile;
+                }
+            }
+
             if (function_exists('hash_file')) {
                 $content_md5 = base64_encode(
-                    hash_file('md5',
-                        $this->source_dir
-                        . DIRECTORY_SEPARATOR 
-                        . $file, 
+                    hash_file('md5', $source_path, 
                         true
                     )
                 );
             }
-            $amz    = 'x-amz-acl:'.$this->acl;
+
+            $amz = '';
+            if (! empty($this->acl)) {
+                $amz = 'x-amz-acl:'.$this->acl;
+            }
             
             // StringToSign
             $str = "$method\n"
@@ -488,10 +725,7 @@ class Killersoft_Service_Amazon_S3_BatchPut {
                 hash_hmac('sha1', $str, 
                 $this->_secret_key, true)
             );
-            $filesize = filesize(
-                $this->source_dir
-                . DIRECTORY_SEPARATOR
-                . $file);
+            $filesize = filesize($source_path);
             
             // Assemble the headers for the PUT request
             // Note lengthy Cache-Control headers
@@ -501,11 +735,16 @@ class Killersoft_Service_Amazon_S3_BatchPut {
                 "Cache-Control: {$this->cache_control}",
                 "Expires: " . gmdate('D, d M Y G:i:s O', 
                     time() + $this->expires),
-                "x-amz-acl: {$this->acl}",
                 "Content-Type: {$content_type}"
             );
+            if (! empty($this->acl)) {
+                $header[] = "x-amz-acl: {$this->acl}";
+            }
             if (! empty($content_md5)) {
                 $header[] = "Content-MD5: {$content_md5}";
+            }
+            if ($compressed) {
+                $header[] = 'Content-Encoding: gzip';
             }
             if (! empty($this->extra_headers)) {
                 foreach ($this->extra_headers as $h) {
@@ -513,16 +752,15 @@ class Killersoft_Service_Amazon_S3_BatchPut {
                 }
             }
             
-            $this->_chs[$i] = curl_init();
-            $this->_fps[$i] = fopen($this->source_dir
-                            . DIRECTORY_SEPARATOR
-                            . $file, 'r');
+            $key = 'https://s3.amazonaws.com' . $dest_path;
+            $this->_chs[$key] = curl_init();
+            $this->_fps[$key] = fopen($source_path, 'r');
             $opts = array(
                 CURLOPT_URL => 'https://s3.amazonaws.com' . $dest_path,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER => true,
                 CURLOPT_PUT => true,
-                CURLOPT_INFILE => $this->_fps[$i],
+                CURLOPT_INFILE => $this->_fps[$key],
                 CURLOPT_INFILESIZE => $filesize,
                 CURLOPT_HTTPHEADER => $header,
                 CURLOPT_SSL_VERIFYPEER => false,
@@ -534,9 +772,64 @@ class Killersoft_Service_Amazon_S3_BatchPut {
                 $opts[CURLOPT_STDERR] = $this->_dbg;
             }
 
-            curl_setopt_array($this->_chs[$i], $opts);
-            curl_multi_add_handle($this->_mh, $this->_chs[$i]);
-            $i++;
+            curl_setopt_array($this->_chs[$key], $opts);
+            curl_multi_add_handle($this->_mh, $this->_chs[$key]);
+            $a++;
+            
+            // create a request for 
+            if (! empty($this->aclpath)) {
+                
+                if (! $this->_aclh) {
+                    $this->_aclh = fopen($this->aclpath, 'r');
+                }
+                
+                if ($this->_aclh) {
+                
+                    $dest_path .= '?acl';
+                    // StringToSign
+                    $str = "$method\n"
+                         . "\n" // content-md5
+                         . "\n" // content-type
+                         . "$date\n"
+                         . $dest_path;
+
+                    $key = 'https://s3.amazonaws.com' 
+                         . substr($dest_path, 0, -4);
+                    
+
+                    $sig = base64_encode(
+                        hash_hmac('sha1', $str, 
+                        $this->_secret_key, true)
+                    );
+                
+                    $header = array(
+                        "Date: {$date}",
+                        "Authorization: AWS {$this->_access_key}:{$sig}",                    
+                    );
+                    
+                    $this->_achs[$key] = curl_init();
+                    $opts = array(
+                        CURLOPT_URL => 'https://s3.amazonaws.com' . $dest_path,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HEADER => true,
+                        CURLOPT_PUT => true,
+                        CURLOPT_INFILE => $this->_aclh,
+                        CURLOPT_INFILESIZE => $filesize,
+                        CURLOPT_HTTPHEADER => $header,
+                        CURLOPT_SSL_VERIFYPEER => false,
+                        CURLOPT_SSL_VERIFYHOST => false,
+                    );
+
+                    if ($this->debug) {
+                        $opts[CURLOPT_VERBOSE] = true;
+                        $opts[CURLOPT_STDERR] = $this->_dbg;
+                    }
+                    
+                    curl_setopt_array($this->_achs[$key], $opts);
+                    
+                }
+            }
+            
         }
     }
 }
