@@ -1,0 +1,139 @@
+{
+    "SMDVersion": "2.0",
+    "id": "https://twitter.com",
+    "target": "/",
+    "description": "Unofficial representation of Twitter's REST API in SMD.",
+    "services": {
+
+        
+        "public_timeline": {
+            "name": "public_timeline",
+            "description": "Returns the 20 most recent statuses from non-protected users who have set a custom user icon. The public timeline is cached for 60 seconds so requesting it more often than that is a waste of resources.",
+            "parameters": [
+                {"type": "null", "description": "No parameters are accepted for this method."}
+            ],            
+            "additionalParameters": false,
+            "services": {
+                "json": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/public_timeline.json",
+                    "contentType": "application/json; charset=utf-8",
+                    "returns": {"type": "array", "description": "Array of status objects"}
+                },
+                "jsonp": {
+                    "transport": "JSONP",
+                    "envelope": "URL",
+                    "target": "/statuses/public_timeline.json",
+                    "contentType": "application/json; charset=utf-8",
+                    "jsonpCallbackParameter": "callback",
+                    "returns": {"type": "string", "description": "Function-wrapped array."}
+                },
+                "xml": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/public_timeline.xml",
+                    "contentType": "application/xml; charset=utf-8",
+                    "returns": {"type": "string", "description": "XML document describing returned statuses"}                    
+                },
+                "rss": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/public_timeline.rss",
+                    "contentType": "application/rss+xml; charset=utf-8",
+                    "returns": {"type": "string", "description": "RSS 2.0 feed"}                    
+                },
+                "atom": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/public_timeline.atom",
+                    "contentType": "application/atom+xml; charset=utf-8",
+                    "returns": {"type": "string", "description": "Atom 1.0 feed"}                    
+                }                
+            },
+            "xRequiresAuthentication": false,
+            "xRateLimited": true,
+            "xDocumentation": "http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-public_timeline"
+        },
+
+
+        
+        "friends_timeline": {
+            "name": "friends_timeline",
+            "description": "Returns the 20 most recent statuses posted by the authenticating user and that user's friends. This is the equivalent of /timeline/home on the Web.",
+            "parameters": [
+                {
+                    "name": "since_id",
+                    "type": "integer",
+                    "optional": true,
+                    "description": "Returns only statuses with an ID greater than (that is, more recent than) the specified ID."
+                },
+                {
+                    "name": "max_id",
+                    "type": "integer",
+                    "optional": true,
+                    "description": "Returns only statuses with an ID less than (that is, older than) or equal to the specified ID."
+                },
+                {
+                    "name": "count",
+                    "type": "integer",
+                    "optional": true,
+                    "maximum": 200,
+                    "description": "Specifies the number of statuses to retrieve. May not be greater than 200."
+                },
+                {
+                    "name": "page",
+                    "type": "integer",
+                    "optional": true,
+                    "description": "Specifies the page of results to retrieve."
+                }
+            ],
+            "additionalParameters": false,
+            "services": {
+                "json": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/friends_timeline.json",
+                    "contentType": "application/json; charset=utf-8",
+                    "returns": {"type": "array", "description": "Array of status objects"}
+                },
+                "jsonp": {
+                    "transport": "JSONP",
+                    "envelope": "URL",
+                    "target": "/statuses/friends_timeline.json",
+                    "contentType": "application/json; charset=utf-8",
+                    "jsonpCallbackParameter": "callback",
+                    "returns": {"type": "string", "description": "Function-wrapped array"}
+                },
+                "xml": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/friends_timeline.xml",
+                    "contentType": "application/xml; charset=utf-8",
+                    "returns": {"type": "string", "description": "XML document describing returned statuses"}                    
+                },
+                "rss": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/friends_timeline.rss",
+                    "contentType": "application/rss+xml; charset=utf-8",
+                    "returns": {"type": "string", "description": "RSS 2.0 feed"}                    
+                },
+                "atom": {
+                    "transport": "GET",
+                    "envelope": "URL",
+                    "target": "/statuses/friends_timeline.atom",
+                    "contentType": "application/atom+xml; charset=utf-8",
+                    "returns": {"type": "string", "description": "Atom 1.0 feed"}                    
+                }
+            },
+            "xRequiresAuthentication": true,
+            "xRateLimited": true,
+            "xDocumentation": "http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-friends_timeline"
+        }
+
+
+
+
+    }
+}
