@@ -12,8 +12,6 @@
  * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
- * Copyright (c) 2009, Clay Loveless. All rights reserved.
- * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -43,15 +41,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
- * @version $Id$
+ * @package Killersoft_Service_Amazon
+ * 
+ * @subpackage Killersoft_Service_Amazon_S3
  * 
  * @todo Add some degree of S3 service fault-tolerance via retries.
  * 
  */
 
 /**
- * Example usage:
+ * BatchPut class for S3.
  * 
+ * Provide a source directory and a destination bucket/path, 
+ * and this class will recursively upload the contents
+ * of the source directory to S3 in parallel, using
+ * curl_multi* functions. 
+ * 
+ * Example usage:
+ * <code>
  * <?php
  * // assumes include_path installation
  * require_once 'Killersoft/Service/Amazon/S3/BatchPut.php';
@@ -72,7 +79,13 @@
  * if ($s3->hadErrors()) {
  *   var_dump($s3->getErrors());
  * }
+ * </code>
  * 
+ * @author Clay Loveless <clay@killersoft.com>
+ * @copyright Copyright (c) 2009, Clay Loveless. All rights reserved.
+ * @version SVN: $Id$
+ * @package Killersoft_Service_Amazon
+ * @subpackage Killersoft_Service_Amazon_S3
  */
 class Killersoft_Service_Amazon_S3_BatchPut {
     
