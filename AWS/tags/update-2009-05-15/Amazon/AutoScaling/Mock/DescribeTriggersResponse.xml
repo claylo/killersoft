@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DescribeTriggersResponse xmlns="http://autoscaling.amazonaws.com/doc/2009-05-15/">
+  <DescribeTriggersResult>
+    <!--1 or more repetitions:-->
+    <Triggers>
+      <TriggerName>string</TriggerName>
+      <AutoScalingGroupName>string</AutoScalingGroupName>
+      <MeasureName>string</MeasureName>
+      <Statistic>string</Statistic>
+      <!--1 or more repetitions:-->
+      <Dimensions>
+        <Name>string</Name>
+        <Value>string</Value>
+      </Dimensions>
+      <Period>100</Period>
+      <!--Optional:-->
+      <Unit>string</Unit>
+      <!--Optional:-->
+      <CustomUnit>string</CustomUnit>
+      <!--Optional:-->
+      <Namespace>string</Namespace>
+      <LowerThreshold>1.051732E7</LowerThreshold>
+      <LowerBreachScaleIncrement>string</LowerBreachScaleIncrement>
+      <UpperThreshold>1.051732E7</UpperThreshold>
+      <UpperBreachScaleIncrement>string</UpperBreachScaleIncrement>
+      <BreachDuration>100</BreachDuration>
+      <Status>string</Status>
+      <CreatedTime>string</CreatedTime>
+    </Triggers>
+  </DescribeTriggersResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DescribeTriggersResponse>

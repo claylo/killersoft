@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetInboundShipmentDataResponse xmlns="http://fba-inbound.amazonaws.com/doc/2007-05-10/">
+  <GetInboundShipmentDataResult>
+    <ShipmentData>
+      <ShipmentId>string</ShipmentId>
+      <ShipmentName>string</ShipmentName>
+      <ShipmentStatus>string</ShipmentStatus>
+      <DestinationFulfillmentCenter>string</DestinationFulfillmentCenter>
+      <ShipToAddress>
+        <Name>string</Name>
+        <AddressLine1>string</AddressLine1>
+        <!--Optional:-->
+        <AddressLine2>string</AddressLine2>
+        <City>string</City>
+        <StateOrProvinceCode>string</StateOrProvinceCode>
+        <CountryCode>string</CountryCode>
+        <!--Optional:-->
+        <PostalCode>string</PostalCode>
+      </ShipToAddress>
+      <ShipFromAddress>
+        <Name>string</Name>
+        <AddressLine1>string</AddressLine1>
+        <!--Optional:-->
+        <AddressLine2>string</AddressLine2>
+        <City>string</City>
+        <StateOrProvinceCode>string</StateOrProvinceCode>
+        <CountryCode>string</CountryCode>
+        <!--Optional:-->
+        <PostalCode>string</PostalCode>
+      </ShipFromAddress>
+      <CreateDate>2008-09-28T18:49:45</CreateDate>
+    </ShipmentData>
+  </GetInboundShipmentDataResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</GetInboundShipmentDataResponse>

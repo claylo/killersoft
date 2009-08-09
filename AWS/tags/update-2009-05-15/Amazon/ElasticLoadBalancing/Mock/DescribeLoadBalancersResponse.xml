@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DescribeLoadBalancersResponse xmlns="http://elasticloadbalancing.amazonaws.com/doc/2009-05-15/">
+  <DescribeLoadBalancersResult>
+    <!--Zero or more repetitions:-->
+    <LoadBalancerDescriptions>
+      <!--Optional:-->
+      <LoadBalancerName>string</LoadBalancerName>
+      <!--Optional:-->
+      <DNSName>string</DNSName>
+      <!--Zero or more repetitions:-->
+      <Listeners>
+        <Protocol>string</Protocol>
+        <LoadBalancerPort>100</LoadBalancerPort>
+        <InstancePort>100</InstancePort>
+      </Listeners>
+      <!--Zero or more repetitions:-->
+      <AvailabilityZones>string</AvailabilityZones>
+      <!--Zero or more repetitions:-->
+      <Instances>
+        <!--Optional:-->
+        <InstanceId>string</InstanceId>
+      </Instances>
+      <!--Optional:-->
+      <HealthCheck>
+        <Target>string</Target>
+        <Interval>100</Interval>
+        <Timeout>100</Timeout>
+        <UnhealthyThreshold>100</UnhealthyThreshold>
+        <HealthyThreshold>100</HealthyThreshold>
+      </HealthCheck>
+      <!--Optional:-->
+      <CreatedTime>string</CreatedTime>
+    </LoadBalancerDescriptions>
+  </DescribeLoadBalancersResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DescribeLoadBalancersResponse>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListInboundShipmentItemsByNextTokenResponse xmlns="http://fba-inbound.amazonaws.com/doc/2007-05-10/">
+  <ListInboundShipmentItemsByNextTokenResult>
+    <NextToken>string</NextToken>
+    <HasNext>false</HasNext>
+    <!--1 or more repetitions:-->
+    <ShipmentItem>
+      <QuantityShipped>3</QuantityShipped>
+      <QuantityReceived>3</QuantityReceived>
+      <FulfillmentNetworkSKU>string</FulfillmentNetworkSKU>
+      <MerchantSKU>string</MerchantSKU>
+    </ShipmentItem>
+  </ListInboundShipmentItemsByNextTokenResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</ListInboundShipmentItemsByNextTokenResponse>

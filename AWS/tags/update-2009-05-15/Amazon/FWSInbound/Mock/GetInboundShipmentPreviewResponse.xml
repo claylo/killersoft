@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetInboundShipmentPreviewResponse xmlns="http://fba-inbound.amazonaws.com/doc/2007-05-10/">
+  <GetInboundShipmentPreviewResult>
+    <!--Zero or more repetitions:-->
+    <ShipmentPreview>
+      <ShipmentId>string</ShipmentId>
+      <DestinationFulfillmentCenter>string</DestinationFulfillmentCenter>
+      <ShipToAddress>
+        <Name>string</Name>
+        <AddressLine1>string</AddressLine1>
+        <!--Optional:-->
+        <AddressLine2>string</AddressLine2>
+        <City>string</City>
+        <StateOrProvinceCode>string</StateOrProvinceCode>
+        <CountryCode>string</CountryCode>
+        <!--Optional:-->
+        <PostalCode>string</PostalCode>
+      </ShipToAddress>
+      <!--1 or more repetitions:-->
+      <MerchantSKUQuantityItem>
+        <MerchantSKU>string</MerchantSKU>
+        <Quantity>3</Quantity>
+      </MerchantSKUQuantityItem>
+    </ShipmentPreview>
+  </GetInboundShipmentPreviewResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</GetInboundShipmentPreviewResponse>

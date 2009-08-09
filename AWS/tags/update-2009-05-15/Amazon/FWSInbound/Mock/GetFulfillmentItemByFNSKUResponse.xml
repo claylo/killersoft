@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetFulfillmentItemByFNSKUResponse xmlns="http://fba-inbound.amazonaws.com/doc/2007-05-10/">
+  <GetFulfillmentItemByFNSKUResult>
+    <!--Zero or more repetitions:-->
+    <FulfillmentItem>
+      <ASIN>string</ASIN>
+      <Condition>string</Condition>
+      <MerchantSKU>string</MerchantSKU>
+      <FulfillmentNetworkSKU>string</FulfillmentNetworkSKU>
+      <IsActive>false</IsActive>
+    </FulfillmentItem>
+  </GetFulfillmentItemByFNSKUResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</GetFulfillmentItemByFNSKUResponse>

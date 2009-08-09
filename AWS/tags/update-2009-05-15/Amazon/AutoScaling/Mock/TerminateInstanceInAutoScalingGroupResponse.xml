@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TerminateInstanceInAutoScalingGroupResponse xmlns="http://autoscaling.amazonaws.com/doc/2009-05-15/">
+  <TerminateInstanceInAutoScalingGroupResult>
+    <!--Optional:-->
+    <Activity>
+      <ActivityId>string</ActivityId>
+      <!--Optional:-->
+      <Description>string</Description>
+      <Cause>string</Cause>
+      <StartTime>string</StartTime>
+      <!--Optional:-->
+      <EndTime>string</EndTime>
+      <StatusCode>string</StatusCode>
+      <!--Optional:-->
+      <StatusMessage>string</StatusMessage>
+      <!--Optional:-->
+      <Progress>100</Progress>
+    </Activity>
+  </TerminateInstanceInAutoScalingGroupResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</TerminateInstanceInAutoScalingGroupResponse>

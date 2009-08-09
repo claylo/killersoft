@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DescribeAutoScalingGroupsResponse xmlns="http://autoscaling.amazonaws.com/doc/2009-05-15/">
+  <DescribeAutoScalingGroupsResult>
+    <!--1 or more repetitions:-->
+    <AutoScalingGroups>
+      <AutoScalingGroupName>string</AutoScalingGroupName>
+      <LaunchConfigurationName>string</LaunchConfigurationName>
+      <MinSize>100</MinSize>
+      <MaxSize>100</MaxSize>
+      <DesiredCapacity>100</DesiredCapacity>
+      <Cooldown>100</Cooldown>
+      <!--1 or more repetitions:-->
+      <AvailabilityZones>string</AvailabilityZones>
+      <!--Zero or more repetitions:-->
+      <LoadBalancerNames>string</LoadBalancerNames>
+      <!--Zero or more repetitions:-->
+      <Instances>
+        <InstanceId>string</InstanceId>
+        <AvailabilityZone>string</AvailabilityZone>
+        <LifecycleState>string</LifecycleState>
+      </Instances>
+      <CreatedTime>string</CreatedTime>
+    </AutoScalingGroups>
+  </DescribeAutoScalingGroupsResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DescribeAutoScalingGroupsResponse>
