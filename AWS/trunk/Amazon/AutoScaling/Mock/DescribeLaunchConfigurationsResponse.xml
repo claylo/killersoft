@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DescribeLaunchConfigurationsResponse xmlns="http://autoscaling.amazonaws.com/doc/2009-05-15/">
+  <DescribeLaunchConfigurationsResult>
+    <!--1 or more repetitions:-->
+    <LaunchConfigurations>
+      <LaunchConfigurationName>string</LaunchConfigurationName>
+      <ImageId>string</ImageId>
+      <!--Optional:-->
+      <KeyName>string</KeyName>
+      <!--Zero or more repetitions:-->
+      <SecurityGroups>string</SecurityGroups>
+      <!--Optional:-->
+      <UserData>string</UserData>
+      <InstanceType>string</InstanceType>
+      <!--Optional:-->
+      <KernelId>string</KernelId>
+      <!--Optional:-->
+      <RamdiskId>string</RamdiskId>
+      <!--Zero or more repetitions:-->
+      <BlockDeviceMappings>
+        <VirtualName>string</VirtualName>
+        <DeviceName>string</DeviceName>
+      </BlockDeviceMappings>
+      <CreatedTime>string</CreatedTime>
+    </LaunchConfigurations>
+    <!--Optional:-->
+    <NextToken>string</NextToken>
+  </DescribeLaunchConfigurationsResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DescribeLaunchConfigurationsResponse>

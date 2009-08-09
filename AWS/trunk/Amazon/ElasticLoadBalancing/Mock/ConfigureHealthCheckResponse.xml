@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ConfigureHealthCheckResponse xmlns="http://elasticloadbalancing.amazonaws.com/doc/2009-05-15/">
+  <ConfigureHealthCheckResult>
+    <!--Optional:-->
+    <HealthCheck>
+      <Target>string</Target>
+      <Interval>100</Interval>
+      <Timeout>100</Timeout>
+      <UnhealthyThreshold>100</UnhealthyThreshold>
+      <HealthyThreshold>100</HealthyThreshold>
+    </HealthCheck>
+  </ConfigureHealthCheckResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</ConfigureHealthCheckResponse>

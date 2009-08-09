@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CreateLoadBalancerResponse xmlns="http://elasticloadbalancing.amazonaws.com/doc/2009-05-15/">
+  <CreateLoadBalancerResult>
+    <!--Optional:-->
+    <DNSName>string</DNSName>
+  </CreateLoadBalancerResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</CreateLoadBalancerResponse>

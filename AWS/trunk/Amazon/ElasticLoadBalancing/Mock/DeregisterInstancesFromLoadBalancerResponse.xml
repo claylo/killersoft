@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DeregisterInstancesFromLoadBalancerResponse xmlns="http://elasticloadbalancing.amazonaws.com/doc/2009-05-15/">
+  <DeregisterInstancesFromLoadBalancerResult>
+    <!--Zero or more repetitions:-->
+    <Instances>
+      <!--Optional:-->
+      <InstanceId>string</InstanceId>
+    </Instances>
+  </DeregisterInstancesFromLoadBalancerResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DeregisterInstancesFromLoadBalancerResponse>

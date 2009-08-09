@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DescribeScalingActivitiesResponse xmlns="http://autoscaling.amazonaws.com/doc/2009-05-15/">
+  <DescribeScalingActivitiesResult>
+    <!--1 or more repetitions:-->
+    <Activities>
+      <ActivityId>string</ActivityId>
+      <!--Optional:-->
+      <Description>string</Description>
+      <Cause>string</Cause>
+      <StartTime>string</StartTime>
+      <!--Optional:-->
+      <EndTime>string</EndTime>
+      <StatusCode>string</StatusCode>
+      <!--Optional:-->
+      <StatusMessage>string</StatusMessage>
+      <!--Optional:-->
+      <Progress>100</Progress>
+    </Activities>
+    <!--Optional:-->
+    <NextToken>string</NextToken>
+  </DescribeScalingActivitiesResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DescribeScalingActivitiesResponse>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EnableAvailabilityZonesForLoadBalancerResponse xmlns="http://elasticloadbalancing.amazonaws.com/doc/2009-05-15/">
+  <EnableAvailabilityZonesForLoadBalancerResult>
+    <!--Zero or more repetitions:-->
+    <AvailabilityZones>string</AvailabilityZones>
+  </EnableAvailabilityZonesForLoadBalancerResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</EnableAvailabilityZonesForLoadBalancerResponse>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetServiceStatusResponse xmlns="http://fba-inbound.amazonaws.com/doc/2007-05-10/">
+  <GetServiceStatusResult>
+    <Status>string</Status>
+  </GetServiceStatusResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</GetServiceStatusResponse>

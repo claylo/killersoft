@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DescribeInstanceHealthResponse xmlns="http://elasticloadbalancing.amazonaws.com/doc/2009-05-15/">
+  <DescribeInstanceHealthResult>
+    <!--Zero or more repetitions:-->
+    <InstanceStates>
+      <!--Optional:-->
+      <InstanceId>string</InstanceId>
+      <!--Optional:-->
+      <State>string</State>
+      <!--Optional:-->
+      <ReasonCode>string</ReasonCode>
+      <!--Optional:-->
+      <Description>string</Description>
+    </InstanceStates>
+  </DescribeInstanceHealthResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</DescribeInstanceHealthResponse>
